@@ -18,7 +18,7 @@ import java.util.Map;
  * 
  * @author xufneg
  */
-public class ThreadPoolConfig implements ILifeCycle {
+public class ThreadPoolConfigCenter implements ILifeCycle {
 
     public final static String DEFAULT_CONFIG_FILE = "/threadpool4j.xml";
 

@@ -16,6 +16,7 @@
 		<workQueueSize>100000</workQueueSize>
 	</pool>
 
+
     <!-- 线程池状态收集汇总配置
     switch: on-开; off-关
     interval: 单位(秒)
