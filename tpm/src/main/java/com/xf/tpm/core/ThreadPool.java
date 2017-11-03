@@ -1,6 +1,7 @@
 package com.xf.tpm.core;
 
 import com.xf.tpm.core.info.ThreadPoolInfo;
+import com.xf.tpm.core.lifecycle.ILifeCycle;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author xufeng
  */
-public interface ThreadPool {
+public interface ThreadPool extends ILifeCycle {
 
     ExecutorService getExecutor();
 
@@ -30,7 +31,6 @@ public interface ThreadPool {
 
     <T> List<Future<T>> invokeAll(Collection<Callable<T>> tasks,
                                   long timeout, TimeUnit timeoutUnit);
-
 
     ThreadPoolInfo getThreadPoolInfo();
 

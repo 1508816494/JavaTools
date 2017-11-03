@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DefaultThreadFactory implements ThreadFactory {
     private AtomicLong count;
     private static final String DEFAULT_THREAD_NAME_PRIFIX = "JT-thread";
-    private ThreadGroup _group;
-    private String _threadNamePrefix;
+    private ThreadGroup group;
+    private String threadNamePrefix;
 
     public DefaultThreadFactory() {
         this("JT-thread");
@@ -18,16 +18,16 @@ public class DefaultThreadFactory implements ThreadFactory {
 
     public DefaultThreadFactory(String threadNamePrefix) {
         this.count = new AtomicLong(1L);
-        this._threadNamePrefix = "JT-thread";
-        this._threadNamePrefix = threadNamePrefix;
+        this.threadNamePrefix = "JT-thread";
+        this.threadNamePrefix = threadNamePrefix;
         ThreadGroup root = this.getRootThreadGroup();
-        this._group = new ThreadGroup(root, this._threadNamePrefix);
+        this.group = new ThreadGroup(root, this.threadNamePrefix);
     }
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread thread = new Thread(this._group, r);
-        thread.setName(this._threadNamePrefix + "-" + this.count.getAndIncrement());
+        Thread thread = new Thread(this.group, r);
+        thread.setName(this.threadNamePrefix + "-" + this.count.getAndIncrement());
         if (thread.isDaemon()) {
             thread.setDaemon(false);
         }
@@ -42,7 +42,7 @@ public class DefaultThreadFactory implements ThreadFactory {
     private ThreadGroup getRootThreadGroup() {
         ThreadGroup threadGroup;
         for(threadGroup = Thread.currentThread().getThreadGroup(); null != threadGroup.getParent(); threadGroup = threadGroup.getParent()) {
-            ;
+
         }
 
         return threadGroup;

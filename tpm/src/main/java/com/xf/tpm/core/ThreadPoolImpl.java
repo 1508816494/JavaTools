@@ -1,7 +1,6 @@
 package com.xf.tpm.core;
 
 import com.xf.tpm.core.info.ThreadPoolInfo;
-import com.xf.tpm.core.lifecycle.ILifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Collection;
@@ -13,7 +12,7 @@ import java.util.concurrent.*;
  * 
  * @author xufeng
  */
-public class ThreadPoolImpl implements ILifeCycle, ThreadPool {
+public class ThreadPoolImpl implements ThreadPool {
 
     private final ThreadPoolInfo threadPoolInfo;
 
@@ -46,7 +45,8 @@ public class ThreadPoolImpl implements ILifeCycle, ThreadPool {
         this.executorService = new ThreadPoolExecutor(threadPoolInfo.getCoreSize(), threadPoolInfo.getMaxSize(),
                 threadPoolInfo.getThreadKeepAliveTime(), TimeUnit.SECONDS, workQueue,
                 new DefaultThreadFactory(threadPoolInfo.getName()));
-        logger.info("initialization thread pool '{}' success", threadPoolInfo.getName());
+        status = ThreadPoolStatus.INITIALITION_SUCCESSFUL;
+        logger.info("initialization thread pool '{}' finished current state {}", threadPoolInfo.getName(),status);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ThreadPoolImpl implements ILifeCycle, ThreadPool {
         if (ThreadPoolStatus.DESTROYED == status) {
             return;
         }
-
+        this.executorService.shutdown();
         status = ThreadPoolStatus.DESTROYED;
     }
 

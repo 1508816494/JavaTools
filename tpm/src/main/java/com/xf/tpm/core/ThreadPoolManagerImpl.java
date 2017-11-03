@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author xufeng on 2017/11/2
@@ -18,15 +19,15 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
 
     private Logger logger = LoggerFactory.getLogger(ThreadPoolManagerImpl.class);
     /**
-     *
      *  默认的线程池名称
-     *
      * */
     private static final String DEFAULT_THREAD_POOL = "default";
 
+    private ReentrantLock reentrantLock = new ReentrantLock();
+
     private ThreadPoolConfigCenter threadPoolConfigCenter = new ThreadPoolConfigCenter();
 
-    private static final ThreadPoolManager instance = new ThreadPoolManagerImpl();
+    private static final ThreadPoolManager INSTANCE = new ThreadPoolManagerImpl();
 
     private Map<String,ThreadPool> multiThreadPool = new HashMap<>(10);
 
@@ -35,19 +36,25 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
     private ThreadStateJob threadStateJob;
 
     private ThreadStackJob threadStackJob;
+
     private ThreadPoolManagerImpl() {
     }
 
     public static ThreadPoolManager getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     @Override
     public void init() {
-        initThreadPool();
-        startThreadPoolStateJob();
-        startThreadStateJob();
-        startThreadStackJob();
+        this.reentrantLock.lock();
+        try {
+            initThreadPool();
+            startThreadPoolStateJob();
+            startThreadStateJob();
+            startThreadStackJob();
+        }finally {
+            reentrantLock.unlock();
+        }
     }
 
     /**
@@ -65,9 +72,7 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
         Collection<ThreadPoolInfo> threadPoolInfoList = threadPoolConfigCenter.getThreadPoolConfig();
 
         for (ThreadPoolInfo threadPoolInfo : threadPoolInfoList) {
-
             multiThreadPool.put(threadPoolInfo.getName(), new ThreadPoolImpl(threadPoolInfo));
-            logger.info("initialization thread pool '{}' success", threadPoolInfo.getName());
         }
     }
 
@@ -84,10 +89,10 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
                 threadPoolConfigCenter.getThreadPoolStateInterval() );
         threadPoolStateJob.init();
         Thread jobThread = new Thread(threadPoolStateJob);
-        jobThread.setName("threadpool4j-threadpoolstate");
+        jobThread.setName("JT-threadpoolstate");
         jobThread.start();
 
-        logger.info("start job 'threadpool4j-threadpoolstate' success");
+        logger.info("start job 'JT-threadpoolstate' success");
     }
 
     /**
@@ -101,10 +106,10 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
         threadStateJob = new ThreadStateJob(threadPoolConfigCenter.getThreadStateInterval());
         threadStateJob.init();
         Thread jobThread = new Thread(threadStateJob);
-        jobThread.setName("threadpool4j-threadstate");
+        jobThread.setName("JT-threadstate");
         jobThread.start();
 
-        logger.info("start job 'threadpool4j-threadstate' success");
+        logger.info("start job 'JT-threadstate' success");
     }
 
     private void startThreadStackJob() {
@@ -115,10 +120,10 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
         threadStackJob = new ThreadStackJob(threadPoolConfigCenter.getThreadStackInterval());
         threadStackJob.init();
         Thread jobThread = new Thread(threadStackJob);
-        jobThread.setName("threadpool4j-threadstack");
+        jobThread.setName("JT-threadstack");
         jobThread.start();
 
-        logger.info("start job 'threadpool4j-threadstack' success");
+        logger.info("start job 'JT-threadstack' success");
     }
 
     @Override
@@ -151,22 +156,36 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
 
     @Override
     public void destroy() {
-        if (null != threadPoolStateJob) {
-            threadPoolStateJob.destroy();
-            logger.info("stop job 'threadpool4j-threadpoolstate' success");
-            threadPoolStateJob = null;
+        this.reentrantLock.lock();
+        try{
+            //先停止收集工作线程
+            if (null != threadPoolStateJob) {
+                threadPoolStateJob.destroy();
+                logger.info("stop job 'JT-threadpoolstate' success");
+                threadPoolStateJob = null;
+            }
+
+            if (null != threadStateJob) {
+                threadStateJob.destroy();
+                logger.info("stop job 'JT-threadstate' success");
+                threadStateJob = null;
+            }
+
+            if (null != threadStackJob) {
+                threadStackJob.destroy();
+                logger.info("stop job 'JT-threadstack' success");
+                threadStackJob = null;
+            }
+
+            for (Map.Entry<String, ThreadPool> entry : multiThreadPool.entrySet()) {
+                logger.info("shutdown the thread pool '{}'", entry.getKey());
+                entry.getValue().destroy();
+            }
+            threadPoolConfigCenter.destroy();
+        }finally {
+            logger.info("all thread pool stop work finished");
+            this.reentrantLock.unlock();
         }
 
-        if (null != threadStateJob) {
-            threadStateJob.destroy();
-            logger.info("stop job 'threadpool4j-threadstate' success");
-            threadStateJob = null;
-        }
-
-        if (null != threadStackJob) {
-            threadStackJob.destroy();
-            logger.info("stop job 'threadpool4j-threadstack' success");
-            threadStackJob = null;
-        }
     }
 }

@@ -33,5 +33,5 @@
     switch: on-开; off-关
     interval: 单位(秒)
      -->
-    <threadstack switch="on" interval="60"></threadstack>
+    <threadstack switch="off" interval="60"></threadstack>
 </threadpool4j>

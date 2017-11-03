@@ -5,8 +5,14 @@ package com.xf.tpm.core.lifecycle;
  */
 public interface ILifeCycle {
 
+    /**
+     * 初始化
+     */
     void init();
 
+    /**
+     * 销毁
+     */
     void destroy();
 
 }

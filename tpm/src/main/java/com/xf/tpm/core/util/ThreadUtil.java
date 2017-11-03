@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 线程实用操作方法集合。
  * 
- * @author <a href="mailto:aofengblog@163.com">聂勇</a>u
+ * @author xufeng
  */
 public class ThreadUtil {
 
@@ -32,7 +32,7 @@ public class ThreadUtil {
         ThreadGroup[] groupList = new ThreadGroup[groupCapacity];
         int groupNum = root.enumerate(groupList, true);
         
-        Map<String, ThreadStateInfo> stateInfoList = new HashMap<String, ThreadStateInfo>();
+        Map<String, ThreadStateInfo> stateInfoList = new HashMap<>(20);
         stateInfoList.put(root.getName(), statSingleGroupThreadState(root));
         for (int i = 0; i <groupNum; i++) {
             ThreadGroup threadGroup = groupList[i];
