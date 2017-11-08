@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class ThreadPoolConfigCenter implements ILifeCycle {
 
-    public final static String DEFAULT_CONFIG_FILE = "/threadpool4j.xml";
+    public final static String DEFAULT_CONFIG_FILE = "/tpm.xml";
 
     private String configFile = DEFAULT_CONFIG_FILE;
     

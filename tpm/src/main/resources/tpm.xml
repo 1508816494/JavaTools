@@ -2,8 +2,8 @@
 <threadpool4j>
 	<!-- 至少要有一个线程池default -->
 	<pool name="default">
-		<corePoolSize>10</corePoolSize>
-		<maxPoolSize>100</maxPoolSize>
+		<corePoolSize>2</corePoolSize>
+		<maxPoolSize>2</maxPoolSize>
 		<!-- 线程空闲存话的时间。单位：秒 -->
 		<keepAliveTime>15</keepAliveTime>
 		<workQueueSize>100000</workQueueSize>
@@ -21,7 +21,7 @@
     switch: on-开; off-关
     interval: 单位(秒)
      -->
-    <threadpoolstate switch="on" interval="60"></threadpoolstate>
+    <threadpoolstate switch="on" interval="10"></threadpoolstate>
 
     <!-- 线程状态收集汇总配置
     switch: on-开; off-关

@@ -6,7 +6,7 @@ import com.xf.tpm.core.lifecycle.ILifeCycle;
 /**
  * @author xufeng on 2017/11/2
  */
-public interface ThreadPoolManager extends ILifeCycle{
+public interface ThreadPoolManager extends ILifeCycle,ThreadPoolMonitor{
 
     /**
      * return the default thread pool

@@ -2,8 +2,11 @@ package com.xf.tpm.test;
 
 import com.xf.tpm.core.ThreadPoolManager;
 import com.xf.tpm.core.ThreadPoolManagerImpl;
+import com.xf.tpm.core.info.ThreadPoolMonitorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Future;
 
 /**
  * @author xufeng on 2017/11/2
@@ -13,15 +16,9 @@ public class ThreadPoolExample {
     public static void main(String[] args) {
         ThreadPoolManager tpm = ThreadPoolManagerImpl.getInstance();
         tpm.init();
-        tpm.getThreadPool().submit(() ->{
-                while (true){
-                    try {
-                        System.out.println("task work");
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        Future<ThreadPoolMonitorInfo> f = tpm.getThreadPool().submit(() ->{
+
+            return new ThreadPoolMonitorInfo();
 
         });
 
@@ -38,15 +35,23 @@ public class ThreadPoolExample {
 
         tpm.getThreadPool("other").submit(()-> {
             try {
-                System.out.println("other work1");
+                System.out.println(Thread.currentThread().getName() + "other work1");
                 Thread.sleep(2000);
             }catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
         });
+        tpm.getThreadPool("other").submit(()-> {
+            try {
+                System.out.println(Thread.currentThread().getName() + "other work2");
+                Thread.sleep(2000);
+            }catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
-        tpm.destroy();
+        System.out.println(tpm.getThreadPoolMonitorInfo("other"));
 
     }
 }

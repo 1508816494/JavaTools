@@ -3,6 +3,7 @@ package com.xf.tpm.core;
 import com.xf.tpm.core.info.ThreadPoolInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
@@ -38,14 +39,16 @@ public class ThreadPoolImpl implements ThreadPool {
     public void init() {
         if (ThreadPoolStatus.UNINITIALIZED != status) {
             logger.warn("initialization thread pool failed, because the status was wrong, current status was {} " +
-                    "(0:UNINITIALIZED, 1:INITIALITION_SUCCESSFUL, 2:INITIALITION_FAILED, 3:DESTROYED)", status);
+                    "(0:UNINITIALIZED, 1:INIT_SUCCESS, 2:INIT_FAILED, 3:DESTROYED)", status);
             return;
         }
+        threadPoolInfo.setCreateTime(System.currentTimeMillis());
+
         BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(threadPoolInfo.getQueueSize());
         this.executorService = new ThreadPoolExecutor(threadPoolInfo.getCoreSize(), threadPoolInfo.getMaxSize(),
                 threadPoolInfo.getThreadKeepAliveTime(), TimeUnit.SECONDS, workQueue,
-                new DefaultThreadFactory(threadPoolInfo.getName()));
-        status = ThreadPoolStatus.INITIALITION_SUCCESSFUL;
+                new ThreadFactoryBuilder().setNameFormat(threadPoolInfo.getName()).build());
+        status = ThreadPoolStatus.INIT_SUCCESS;
         logger.info("initialization thread pool '{}' finished current state {}", threadPoolInfo.getName(),status);
     }
 

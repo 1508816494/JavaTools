@@ -1,15 +1,17 @@
 package com.xf.tpm.core;
 
 import com.xf.tpm.core.info.ThreadPoolInfo;
-import com.xf.tpm.core.job.ThreadPoolStateJob;
-import com.xf.tpm.core.job.ThreadStackJob;
-import com.xf.tpm.core.job.ThreadStateJob;
+import com.xf.tpm.core.info.ThreadPoolMonitorInfo;
+import com.xf.tpm.core.monitor.ThreadPoolStateJob;
+import com.xf.tpm.core.monitor.ThreadStackJob;
+import com.xf.tpm.core.monitor.ThreadStateJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -55,6 +57,19 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager {
         }finally {
             reentrantLock.unlock();
         }
+    }
+
+    @Override
+    public ThreadPoolMonitorInfo getThreadPoolMonitorInfo(String threadPoolName) {
+        ThreadPool threadPool = getExistThreadPool(threadPoolName);
+        ThreadPoolMonitorInfo tpmInfo = new ThreadPoolMonitorInfo();
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) threadPool.getExecutor();
+        tpmInfo.setActiveCount(threadPoolExecutor.getActiveCount());
+        tpmInfo.setCompletedTaskCount(threadPoolExecutor.getCompletedTaskCount());
+        tpmInfo.setPoolName(threadPool.getThreadPoolInfo().getName());
+        tpmInfo.setTotalTask(threadPoolExecutor.getTaskCount());
+        tpmInfo.setCreateTime(threadPool.getThreadPoolInfo().getCreateTime());
+        return tpmInfo;
     }
 
     /**

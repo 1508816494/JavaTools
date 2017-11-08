@@ -15,12 +15,12 @@ public enum  ThreadPoolStatus {
     /**
      * 初始化成功
      */
-    INITIALITION_SUCCESSFUL,
+    INIT_SUCCESS,
 
     /**
      * 初始化失败
      */
-    INITIALITION_FAILED,
+    INIT_FAILED,
 
     /**
      * 已销毁

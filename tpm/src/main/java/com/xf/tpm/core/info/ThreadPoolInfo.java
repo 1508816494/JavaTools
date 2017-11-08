@@ -36,6 +36,11 @@ public class ThreadPoolInfo implements Serializable, Cloneable {
      */
     private int queueSize = 10000;
 
+    /**
+     * 线程池启动时间
+     */
+    private long createTime;
+
     public String getName() {
         return name;
     }
@@ -76,6 +81,14 @@ public class ThreadPoolInfo implements Serializable, Cloneable {
         this.queueSize = queueSize;
     }
 
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public ThreadPoolInfo clone() {
         ThreadPoolInfo obj = new ThreadPoolInfo();
@@ -84,7 +97,7 @@ public class ThreadPoolInfo implements Serializable, Cloneable {
         obj.maxSize = this.maxSize;
         obj.threadKeepAliveTime = this.threadKeepAliveTime;
         obj.queueSize = this.queueSize;
-
+        obj.createTime = this.createTime;
         return obj;
     }
 
@@ -120,15 +133,13 @@ public class ThreadPoolInfo implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder(160)
-                .append("ThreadPoolInfo [name=").append(name)
-                .append(", coreSize=").append(coreSize)
-                .append(", maxSize=").append(maxSize)
-                .append(", threadKeepAliveTime=").append(threadKeepAliveTime)
-                .append(", queueSize=").append(queueSize).append("]");
-
-        return buffer.toString();
+        return "ThreadPoolInfo{" +
+                "name='" + name + '\'' +
+                ", coreSize=" + coreSize +
+                ", maxSize=" + maxSize +
+                ", threadKeepAliveTime=" + threadKeepAliveTime +
+                ", queueSize=" + queueSize +
+                ", createTime=" + createTime +
+                '}';
     }
-
-
 }
